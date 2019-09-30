@@ -16,6 +16,29 @@
 
 accumulator.model <- function(samples, rate.1=40, rate.2=40, criterion=3){
   
+  rt.array <- rep(0, samples)
+  accuracy.array <- rep(TRUE, samples)
+  evidence.correct.array <- rep(0, samples)
+  evidence.incorrect.array <- rep(0, samples)
+  
+  
+  for(i in 1:samples){
+    while(evidence.correct.array[i] < criterion && evidence.incorrect.array[i] < criterion){
+      evidence.correct.array[i] <- evidence.correct.array[i] + rexp(1, rate = rate.1)
+      evidence.incorrect.array[i] <- evidence.incorrect.array[i] + rexp(1, rate = rate.2)
+      rt.array[i] <- rt.array[i] + 1
+    }
+    if(evidence.correct.array[i] != evidence.incorrect.array[i]){
+      if(evidence.correct.array[i] >= criterion){
+      accuracy.array[i] <- TRUE
+      }
+      if(evidence.incorrect.array[i] >= criterion){
+      accuracy.array[i] <- FALSE
+      }else{
+      accuracy.array[i] <- evidence.correct.array[i] > evidence.incorrect.array[i]
+     }
+    }
+  }
 
   output <- data.frame(
     correct = accuracy.array,

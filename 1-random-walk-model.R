@@ -11,6 +11,22 @@
 
 random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
   
+  rt.array <- rep(0, samples)
+  accuracy.array <- rep(TRUE, samples)
+  evidence.array <- rep(0, samples)
+  
+  for(i in 1:samples){
+    while(abs(evidence.array[i]) < criterion){
+      evidence.array[i] <- evidence.array[i] + rnorm(1, drift, sdrw)
+      rt.array[i] <- rt.array[i] + 1
+    }
+    if(evidence.array[i] < (-criterion)){
+      accuracy.array[i] <- FALSE
+    }else{
+      accuracy.array[i] <- TRUE
+    }
+  }
+  
   output <- data.frame(
     correct = accuracy.array,
     rt = rt.array
@@ -26,6 +42,7 @@ random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
 # be around 112, but might vary from that by a bit.
 
 initial.test <- random.walk.model(1000)
+initial.test
 sum(initial.test$correct) / length(initial.test$correct) # should be close to 0.5
 mean(initial.test$rt) # should be about 112
 
